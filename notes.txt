@@ -1,0 +1,78 @@
+********************************************************************************
+Created Docker and base application
+1. Create "Dockerfile"
+
+FROM django:1.9.5-python2
+MAINTAINER Kevin
+ENV DIR /src/
+RUN mkdir ${DIR}
+COPY requirements.txt .
+RUN ["pip","install","-r","requirements.txt"]
+WORKDIR ${DIR}
+LABEL version="1.0" \
+      description="This image is used to set up django sevier."
+      
+2. requirements.txt
+djangorestframework==3.3.3
+
+3. Build the image
+docker build -t kevin/web .
+
+4. docker-compose
+edit docker-compose.yml 
+
+version: '2'
+services:
+  web:
+    build: .
+    command: bash -c "python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/src
+    ports:
+      - "8000:8000"
+docker-compose build
+5.  Create a python project (VPN can not support this step)
+docker-compose run web django-admin.py startproject kshop  .
+
+
+
+6. Create a python app
+docker-compose run web python manage.py startapp users
+
+7. Change ownership of created code
+sudo chown -R $USER:$USER .
+
+8. Init database & super users:
+docker-compose run web python manage.py migrate
+docker-compose run web python manage.py makemigrations
+docker-compose run web python manage.py createsuperuser
+
+
+9. Set up server to check if everything is fine
+docker-compose up
+
+10. cleean useless containers.
+docker stop $(docker ps -a -q)
+docker rm -f $(docker ps -a -q)
+
+11. Check port usage:
+netstat -anp | grep 834
+
+********************************************************************************
+1. remove postgres deamon
+sudo apt-get --purge autoremove postgresql*
+
+2. install client on the console only:
+sudo apt-get install postgresql-client-*
+
+3. After running the deamon, test database's connection
+psql -h localhost -p 5432 -U postgres
+
+Set up database
+
+docker-compose run web python manage.py migrate
+docker-compose run web python manage.py makemigrations
+
+5. Create user and database for the application
+psql -h localhost -p 5432 -U postgres -f ./scripts/init_database.sql
+docker-compose run web python manage.py createsuperuser # reset database mustbe
