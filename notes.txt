@@ -1,4 +1,7 @@
 ********************************************************************************
+User: admin
+Password: kshop123
+********************************************************************************
 Created Docker and base application
 1. Create "Dockerfile"
 
@@ -37,7 +40,7 @@ docker-compose run web django-admin.py startproject kshop  .
 
 
 6. Create a python app
-docker-compose run web python manage.py startapp users
+docker-compose run web python manage.py startapp goods
 
 7. Change ownership of created code
 sudo chown -R $USER:$USER .
@@ -51,7 +54,7 @@ docker-compose run web python manage.py createsuperuser
 9. Set up server to check if everything is fine
 docker-compose up
 
-10. cleean useless containers.
+10. clean useless containers.
 docker stop $(docker ps -a -q)
 docker rm -f $(docker ps -a -q)
 
@@ -70,9 +73,23 @@ psql -h localhost -p 5432 -U postgres
 
 Set up database
 
-docker-compose run web python manage.py migrate
+# to show database update
 docker-compose run web python manage.py makemigrations
+
+# to migrate
+docker-compose run web python manage.py migrate
+
 
 5. Create user and database for the application
 psql -h localhost -p 5432 -U postgres -f ./scripts/init_database.sql
+
 docker-compose run web python manage.py createsuperuser # reset database mustbe
+
+/du  #userlist
+/l # user & access control
+/z #显示权限和表
+
+\c myapp; #change database
+\q quit
+
+# delete some migration related tables to reset migration
