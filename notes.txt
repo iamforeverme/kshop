@@ -93,3 +93,7 @@ docker-compose run web python manage.py createsuperuser # reset database mustbe
 \q quit
 
 # delete some migration related tables to reset migration
+
+
+FYI:
+Milk powder: http://mt.sohu.com/20150108/n407645079.shtml 

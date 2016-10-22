@@ -9,13 +9,6 @@ class ProducerSerializer(serializers.ModelSerializer):
 class BrandSerializer(serializers.ModelSerializer):
     # This is for nested serializer
     producer = ProducerSerializer()
-    def create(self, validated_data):
-        print "hi"
-        producer_data = validated_data.pop('producer')
-        brand = Brand.objects.create(**validated_data)
-        Producer.objects.create(producer=producer, **producer_data)
-        return brand
-
     class Meta:
         model = Brand
         fields = ('producer', 'brand_name')
@@ -23,8 +16,8 @@ class BrandSerializer(serializers.ModelSerializer):
         depth = 2
 
 class ProductSerializer(serializers.ModelSerializer):
-    # brand = BrandSerializer()
+    brand = BrandSerializer()
     class Meta:
         model = Product
-        fields = ('brand', 'product_name','product_description', 'price')
+        fields = ('brand', 'product_name','product_description', 'price' , 'general_photo')
         depth = 3

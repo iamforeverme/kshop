@@ -11,8 +11,12 @@ class Producer(models.Model):
     )
     producer_name = models.CharField(max_length=100,unique=True)
     produced_country = models.CharField(max_length=3, choices=COUNTY)
+
     def __unicode__(self):
-       return self.producer_name
+        """
+            show obj in the admin
+        """
+        return self.producer_name
 
 class Brand(models.Model):
     producer = models.ForeignKey(Producer, on_delete=models.CASCADE)
@@ -25,6 +29,8 @@ class Product(models.Model):
     product_name = models.CharField(max_length=100)
     product_description = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    general_photo  =   models.FileField(upload_to='goods/static/')
+
     def __unicode__(self):
        return self.brand.producer.producer_name + ":" + self.brand.brand_name + self.product_name
     
