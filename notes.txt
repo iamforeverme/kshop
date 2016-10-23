@@ -97,3 +97,94 @@ docker-compose run web python manage.py createsuperuser # reset database mustbe
 
 FYI:
 Milk powder: http://mt.sohu.com/20150108/n407645079.shtml 
+
+
+Django:
+
+Tutorials:
+https://docs.djangoproject.com/en/1.10/intro/tutorial04/
+
+APIs:
+https://docs.djangoproject.com/en/1.10/ref/
+
+Best practices:
+https://docs.djangoproject.com/en/1.10/topics/
+
+How-to:
+https://docs.djangoproject.com/en/1.10/howto/
+
+python -m django --version
+django-admin startproject mysite
+python manage.py runserver 0.0.0.0:8000
+
+Run python manage.py makemigrations to create migrations for those changes
+Run python manage.py migrate to apply those changes to the database.
+
+Shell: 
+python manage.py shell
+>>> from polls.models import Question, Choice   # Import the model classes we just wrote.
+# No questions are in the system yet.
+>>> Question.objects.all()
+<QuerySet []>
+
+# Create a new Question.
+# Support for time zones is enabled in the default settings file, so
+# Django expects a datetime with tzinfo for pub_date. Use timezone.now()
+# instead of datetime.datetime.now() and it will do the right thing.
+>>> from django.utils import timezone
+>>> q = Question(question_text="What's new?", pub_date=timezone.now())
+>>> q.save()
+>>> q.id
+>>> Choice.objects.filter(question__pub_date__year=current_year)
+<QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
+# Let's delete one of the choices. Use delete() for that.
+>>> c = q.choice_set.filter(choice_text__startswith='Just hacking')
+>>> c.delete()
+latest_question_list = Question.objects.order_by('-pub_date')[:5]
+
+
+
+Database:
+show tables: \dt (PostgreSQL), SHOW TABLES; (MySQL), 
+
+Add meaningful lines for ORM:
+def __str__(self):
+    return self.choice_text
+
+Template:
+from django.template import loader
+def detail(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    return render(request, 'polls/detail.html', {'question': question})
+
+polls/templates/polls/detail.html
+<h1>{{ question.question_text }}</h1>
+<ul>
+{% for choice in question.choice_set.all %}
+    <li>{{ choice.choice_text }}</li>
+{% endfor %}
+</ul>
+
+URL:
+1. reverse url:
+url(r'^(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
+<li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
+
+View functions:
+def vote(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    try:
+        selected_choice = question.choice_set.get(pk=request.POST['choice'])
+    except (KeyError, Choice.DoesNotExist):
+        # Redisplay the question voting form.
+        return render(request, 'polls/detail.html', {
+            'question': question,
+            'error_message': "You didn't select a choice.",
+        })
+    else:
+        selected_choice.votes += 1
+        selected_choice.save()
+        # Always return an HttpResponseRedirect after successfully dealing
+        # with POST data. This prevents data from being posted twice if a
+        # user hits the Back button.
+        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))

@@ -2,6 +2,7 @@ from django.conf.urls import url
 from rest_framework.urlpatterns import format_suffix_patterns
 from goods import views
 
+
 urlpatterns = [
     url(r'^producer/$', views.ProducerList.as_view()),
     url(r'^producer/(?P<pk>[0-9]+)/$', views.ProducerDetail.as_view()),
